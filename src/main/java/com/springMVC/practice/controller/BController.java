@@ -1,17 +1,37 @@
 package com.springMVC.practice.controller;
 
 import com.springMVC.practice.command.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 @Controller
 public class BController {
     BCommand command; // 각 페이지에서 실행할 커맨드 생성
-    
+    Logger logger = LoggerFactory.getLogger(BController.class);
+
+    @RequestMapping("/")
+    public String home(Locale locale, Model model) {
+        logger.info("Welcome home! The client locale is {}.", locale);
+
+        Date date = new Date();
+        DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+
+        String formattedDate = dateFormat.format(date);
+
+        model.addAttribute("serverTime", formattedDate );
+
+        return "home";
+    }
+
     // 글 리스트 보이기
     @RequestMapping("/list")
     public String list(Model model){
