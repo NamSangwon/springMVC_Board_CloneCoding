@@ -4,19 +4,22 @@ import com.springMVC.practice.dto.BDto;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.ConnectionEvent;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 
 public class BDao {
-    DataSource dataSource;
+    String url;
+    String username;
+    String password;
     public BDao() {
         try {
-            Context context = new InitialContext();
-            dataSource = (DataSource) context.lookup("jdbc:mysql://localhost:3306");
-        } catch (NamingException e){
+            Class.forName("com.mysql.jdbc.Driver");
+            url = "jdbc:mysql://localhost:3306/spring_practice";
+            username = "root";
+            password = "0000";
+
+        } catch (Exception e){
             e.printStackTrace();
         }
     }
@@ -29,8 +32,8 @@ public class BDao {
         ResultSet resultSet = null;
 
         try{
-            connection = dataSource.getConnection();
-            String query = "select b from mvc_board order by bGroup desc, bStep asc";
+            connection = DriverManager.getConnection(url, username, password);
+            String query = "select * from board_mvc order by bGroup desc, bStep asc";
             preparedStatement = connection.prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
 
