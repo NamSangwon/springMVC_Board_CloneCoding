@@ -1,5 +1,7 @@
 package com.springMVC.practice.command;
 
+import com.springMVC.practice.dao.BDao;
+import com.springMVC.practice.dto.BDto;
 import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +16,9 @@ public class BContentCommand implements BCommand{
         HttpServletRequest request = (HttpServletRequest) map.get("request"); // Model에서 HttpServletRequest 구하기
         String bId = request.getParameter("bId"); // Model에서 id 구하기
 
+        BDao dao = new BDao();
+        BDto dto = dao.contentView(bId);
 
+        model.addAttribute("content_view", dto);
     }
 }
