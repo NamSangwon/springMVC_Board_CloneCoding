@@ -136,6 +136,34 @@ public class BDao {
         return dto;
     }
 
+    public void modify(String bId, String bName, String bTitle, String bContent){
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+
+        try{
+            connection = DriverManager.getConnection(url, username, password);
+            String query = "update board_mvc set bName=?, bTitle=?, bContent=? where bId=?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1,bName);
+            preparedStatement.setString(2,bTitle);
+            preparedStatement.setString(3,bContent);
+            preparedStatement.setInt(4, parseInt(bId));
+
+            preparedStatement.executeUpdate();
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (preparedStatement != null) preparedStatement.close();
+                if (connection != null) connection.close();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
     // 조회수 증가
     private void upHit(String bId){
         Connection connection = null;
