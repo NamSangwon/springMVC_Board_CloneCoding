@@ -68,19 +68,22 @@ public class BDao {
     }
 
     public void write(String bName, String bTitle, String bContent){
+        
+        int group_num = get_max_id();
+        
         Connection connection = null;
         PreparedStatement preparedStatement = null;
 
         try{
             connection = DriverManager.getConnection(url, username, password);
-            String query = "insert into board_mvc (bName, bTitle, bContent, bHit, bGroup, bStep, bIndent) values (?, ?, ?, 0, (select max(bId) + 1 from board_mvc), 0, 0)";
-            ;
+            String query = "insert into board_mvc (bName, bTitle, bContent, bHit, bGroup, bStep, bIndent) values (?,?,?,0,?,0,0)";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, bName);
             preparedStatement.setString(2, bTitle);
             preparedStatement.setString(3, bContent);
-
+            preparedStatement.setInt(4, group_num);
             preparedStatement.executeUpdate();
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -91,6 +94,36 @@ public class BDao {
                 e.printStackTrace();
             }
         }
+    }
+
+    private int get_max_id() {
+        int group_num = 1;
+
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try{
+            connection = DriverManager.getConnection(url, username, password);
+            String query = "select bId from board_mvc order by bId desc limit 1";
+            preparedStatement = connection.prepareStatement(query);
+            resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next()) group_num = resultSet.getInt("bId")+1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (preparedStatement != null) preparedStatement.close();
+                if (connection != null) connection.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return group_num;
     }
 
     public BDto contentView(String strId){
@@ -175,6 +208,104 @@ public class BDao {
             preparedStatement.setInt(1, parseInt(strId));
 
             preparedStatement.executeUpdate();
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (preparedStatement != null) preparedStatement.close();
+                if (connection != null) connection.close();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public BDto reply_view(String strId){
+        BDto dto = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try{
+            connection = DriverManager.getConnection(url, username, password);
+            String query = "select * from board_mvc where bId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, parseInt(strId));
+            resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next()){
+                int bId = resultSet.getInt("bId");
+                String bName =resultSet.getString("bName");
+                String bTitle =resultSet.getString("bTitle");
+                String bContent =resultSet.getString("bContent");
+                Timestamp bDate =resultSet.getTimestamp("bDate");
+                int bHit = resultSet.getInt("bHit");
+                int bGroup = resultSet.getInt("bGroup");
+                int bStep = resultSet.getInt("bStep");
+                int bIndent = resultSet.getInt("bIndent");
+
+                dto = new BDto(bId, bName, bTitle, bContent, bDate, bHit, bGroup, bStep, bIndent);
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (preparedStatement != null) preparedStatement.close();
+                if (connection != null) connection.close();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return dto;
+    }
+
+    public void reply(String bName, String bTitle, String bContent, String bGroup, String bStep, String bIndent){
+        reply_shape(bGroup, bStep);
+        
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+
+        try{
+            connection = DriverManager.getConnection(url, username, password);
+            String query = "insert into board_mvc (bName, bTitle, bContent, bGroup, bStep, bIndent) values (?,?,?,?,?,?)";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, bName);
+            preparedStatement.setString(2, bTitle);
+            preparedStatement.setString(3, bContent);
+            preparedStatement.setInt(4, parseInt(bGroup));
+            preparedStatement.setInt(5, parseInt(bStep)+1);
+            preparedStatement.setInt(6, parseInt(bIndent)+1);
+
+            preparedStatement.executeUpdate();
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (preparedStatement != null) preparedStatement.close();
+                if (connection != null) connection.close();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void reply_shape(String bGroup, String bStep) {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+
+        try{
+            connection = DriverManager.getConnection(url, username, password);
+            String query = "update board_mvc set bStep=bStep+1 where bGroup=? and bStep > ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, parseInt(bGroup));
+            preparedStatement.setInt(2, parseInt(bStep));
 
         } catch (Exception e){
             e.printStackTrace();
