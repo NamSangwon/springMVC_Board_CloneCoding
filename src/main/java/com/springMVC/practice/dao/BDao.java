@@ -73,8 +73,8 @@ public class BDao {
 
         try{
             connection = DriverManager.getConnection(url, username, password);
-            String query = "insert into board_mvc (bName, bTitle, bContent, bHit, bGroup, bStep, bIndent) " +
-                    "values (?,?,?,0,0,0,0)";
+            String query = "insert into board_mvc (bName, bTitle, bContent, bHit, bGroup, bStep, bIndent) values (?, ?, ?, 0, (select max(bId) + 1 from board_mvc), 0, 0)";
+            ;
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, bName);
             preparedStatement.setString(2, bTitle);
@@ -148,6 +148,31 @@ public class BDao {
             preparedStatement.setString(2,bTitle);
             preparedStatement.setString(3,bContent);
             preparedStatement.setInt(4, parseInt(bId));
+
+            preparedStatement.executeUpdate();
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (preparedStatement != null) preparedStatement.close();
+                if (connection != null) connection.close();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void delete(String strId){
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+
+        try{
+            connection = DriverManager.getConnection(url, username, password);
+            String query = "delete from board_mvc where bId=?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, parseInt(strId));
 
             preparedStatement.executeUpdate();
 
