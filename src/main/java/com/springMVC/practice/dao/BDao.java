@@ -65,4 +65,30 @@ public class BDao {
 
         return dtos;
     }
+
+    public void write(String bName, String bTitle, String bContent){
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+
+        try{
+            connection = DriverManager.getConnection(url, username, password);
+            String query = "insert into board_mvc (bName, bTitle, bContent, bHit, bGroup, bStep, bIndent) " +
+                    "values (?,?,?,0,0,0,0)";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, bName);
+            preparedStatement.setString(2, bTitle);
+            preparedStatement.setString(3, bContent);
+
+            preparedStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (preparedStatement != null) preparedStatement.close();
+                if (connection != null) connection.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
