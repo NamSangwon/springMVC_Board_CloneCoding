@@ -4,7 +4,6 @@ import com.springMVC.practice.dto.BDto;
 import com.springMVC.practice.util.Constant;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 
 import java.sql.*;
