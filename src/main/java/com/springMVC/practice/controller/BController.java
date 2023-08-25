@@ -1,8 +1,11 @@
 package com.springMVC.practice.controller;
 
 import com.springMVC.practice.command.*;
+import com.springMVC.practice.util.Constant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +20,14 @@ import java.util.Locale;
 public class BController {
     BCommand command; // 각 페이지에서 실행할 커맨드 생성
     Logger logger = LoggerFactory.getLogger(BController.class);
+
+    // JDBC Template Setter
+    JdbcTemplate template;
+    @Autowired
+    public void setTemplate(JdbcTemplate template) {
+        this.template = template;
+        Constant.template = this.template;
+    }
 
     @RequestMapping("/")
     public String home(Locale locale, Model model) {
