@@ -1,6 +1,9 @@
 package com.springMVC.practice.dao;
 
 import com.springMVC.practice.dto.BDto;
+import com.springMVC.practice.util.Constant;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -14,55 +17,26 @@ public class BDao {
     String url;
     String username;
     String password;
+    JdbcTemplate template = null;
     public BDao() {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            url = "jdbc:mysql://localhost:3306/spring_practice";
-            username = "root";
-            password = "0000";
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+//        try {
+//            Class.forName("com.mysql.jdbc.Driver");
+//            url = "jdbc:mysql://localhost:3306/spring_practice";
+//            username = "root";
+//            password = "0000";
+//
+//        } catch (Exception e){
+//            e.printStackTrace();
+//        }
+        template = Constant.template; // Bean으로 생성된 JDBC Template 사용
     }
 
     public ArrayList<BDto> list(){
-        ArrayList<BDto> dtos = new ArrayList<BDto>();
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
+        ArrayList<BDto> dtos = null;
 
-        try{
-            connection = DriverManager.getConnection(url, username, password);
-            String query = "select * from board_mvc order by bGroup desc, bStep asc";
-            preparedStatement = connection.prepareStatement(query);
-            resultSet = preparedStatement.executeQuery();
-
-            while(resultSet.next()){
-                int bId = resultSet.getInt("bId");
-                String bName =resultSet.getString("bName");
-                String bTitle =resultSet.getString("bTitle");
-                String bContent =resultSet.getString("bContent");
-                Timestamp bDate =resultSet.getTimestamp("bDate");
-                int bHit = resultSet.getInt("bHit");
-                int bGroup = resultSet.getInt("bGroup");
-                int bStep = resultSet.getInt("bStep");
-                int bIndent = resultSet.getInt("bIndent");
-
-                BDto dto = new BDto(bId, bName, bTitle, bContent, bDate, bHit, bGroup, bStep, bIndent);
-                dtos.add(dto);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (resultSet != null) resultSet.close();
-                if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) connection.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        String query = "select * from board_mvc order by bGroup desc, bStep asc";
+        // query문을 실행한 결과를 BeanPropertyRowMapper 객체에 저장
+        dtos = (ArrayList<BDto>) template.query(query, new BeanPropertyRowMapper<BDto>(BDto.class));
 
         return dtos;
     }
