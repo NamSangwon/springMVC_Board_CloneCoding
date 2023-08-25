@@ -16,12 +16,9 @@
     <beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <beans:property name="prefix" value="/WEB-INF/views/" />
         <beans:property name="suffix" value=".jsp" />
-
-        <!-- 프로젝트 패키지이름 확인 -->
-        <context:component-scan base-package="com.springMVC.practice.controller" />
     </beans:bean>
 
-    <!-- mysql dconfig -->
+    <!-- mysql config (JDBC Template에 연결해서 사용) -->
     <beans:bean name="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <beans:property name="driverClassName" value="com.mysql.jdbc.Driver"/>
         <beans:property name="url" value="jdbc:mysql://localhost:3306/spring_practice"/>
@@ -29,7 +26,11 @@
         <beans:property name="password" value="0000"/>
     </beans:bean>
 
+    <!-- JDBC Template Bean 생성 (위의 bean 사용) -->
     <beans:bean name="template" class="org.springframework.jdbc.core.JdbcTemplate">
         <beans:property name="dataSource" ref="dataSource"/>
     </beans:bean>
+
+    <!-- 프로젝트 패키지이름 확인 -->
+    <context:component-scan base-package="com.springMVC.practice.controller" />
 </beans:beans>
